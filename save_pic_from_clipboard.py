@@ -8,9 +8,9 @@ import json
 
 class SaveClipBoardPic:
     def __init__(self) -> None:
-        if not os.path.exists("./settings.json"):
-            sys.stdout("no file \"settings.json\", use -i to init")
-            sys.exit(0)
+        # if not os.path.exists("./settings.json"):
+        #     print("no file \"settings.json\", use -i to init")
+        #     sys.exit(0)
         self.save_folder_path = ""
         self.file_dict = dict()
 
@@ -47,8 +47,14 @@ class SaveClipBoardPic:
             json.dump(self.file_dict, f)
 
     def load_settings(self):
-        with open("settings.json", "r") as f:
-            self.file_dict = json.load(f)
+        try:
+            with open("settings.json", "r") as f:
+            
+                self.file_dict = json.load(f)
+        except FileNotFoundError:
+            print("Error: No such file or directory: 'settings.json'")
+            print("use -i to init it")
+            sys.exit(-1)
         
         try:
             folder_name, file_type = self.file_dict["save folder"], self.file_dict["pic type"]
