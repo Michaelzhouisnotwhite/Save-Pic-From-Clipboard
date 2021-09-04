@@ -1,2 +1,5 @@
 save_pic_from_clipboard.code-workspace
 .vscode
+build
+dist
+save_pic_from_clipboard.spec

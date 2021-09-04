@@ -13,6 +13,7 @@ class SaveClipBoardPic:
         #     sys.exit(0)
         self.save_folder_path = ""
         self.file_dict = dict()
+        self.setting_file_path = "save-pic-settings.json"
 
     def save(self, file_name):
         im = ImageGrab.grabclipboard()
@@ -20,20 +21,21 @@ class SaveClipBoardPic:
             print("image:size:%s, mode: %s" % (im.size, im.mode))
             try:
                 im.save(os.path.join(self.save_folder_path, file_name + self.file_dict["pic type"]))
+                print("pic is saved in path:\"{}\"".format(os.path.join(self.save_folder_path, file_name + self.file_dict["pic type"])))
             except FileNotFoundError as e:
                 print(e.strerror)
                 print("use -i to init folder or use --folder to set another folder")
                 sys.exit(-1)
-        elif im:
-            for filename in im:
-                try:
-                    print("filename: %s" % filename)
-                    im = Image.open(filename)
-                except IOError:
-                    pass  # ignore this file
-                else:
-                    print("ImageList: size : %s, mode: %s" % (im.size, im.mode))
-                    print("Path: " + os.path.abspath(filename))
+        # elif im:
+        #     for filename in im:
+        #         try:
+        #             print("filename: %s" % filename)
+        #             im = Image.open(filename)
+        #         except IOError:
+        #             pass  # ignore this file
+        #         else:
+        #             print("ImageList: size : %s, mode: %s" % (im.size, im.mode))
+        #             print("Path: " + os.path.abspath(filename))
         else:
             print("no pic in clipboard.")
 
@@ -43,16 +45,16 @@ class SaveClipBoardPic:
 
     def init_setting(self):
         self.file_dict = {"save folder": ".", "pic type": ".png"}
-        with open("settings.json", "w") as f:
+        with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
 
     def load_settings(self):
         try:
-            with open("settings.json", "r") as f:
+            with open(self.setting_file_path, "r") as f:
             
                 self.file_dict = json.load(f)
         except FileNotFoundError:
-            print("Error: No such file or directory: 'settings.json'")
+            print("you haven't init this program")
             print("use -i to init it")
             sys.exit(-1)
         
@@ -64,7 +66,7 @@ class SaveClipBoardPic:
 
     def change_folder(self, folder_name: str):
         self.file_dict["save folder"] = folder_name
-        with open("settings.json", "w") as f:
+        with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
             
     def change_type(self, tp: str):
@@ -72,7 +74,7 @@ class SaveClipBoardPic:
             print("Error: type only support \" .jpg\", \" .png\"")
             sys.exit(-1)
         self.file_dict["pic type"] = tp
-        with open("settings.json", "w") as f:
+        with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
     
     @staticmethod
@@ -86,7 +88,7 @@ class SaveClipBoardPic:
         
     def run(self, argv):
         try:
-            opts, args = getopt.getopt(argv, "hin:", ["name=", "help", "init", "folder=", "type="])
+            opts, args = getopt.getopt(argv, "hin:", ["name=", "help", "init", "folder=", "type=", "where"])
         except getopt.GetoptError:
             print("Use -h to see all args")
             sys.exit(-1)
@@ -101,9 +103,10 @@ class SaveClipBoardPic:
                 
             elif opt in ["-i", "--init"]:
                 self.init_setting()
+                
             elif opt=="--folder":
                 self.load_settings()
-                self.change_folder(arg)
+                self.change_folder(os.path.abspath(arg))
                 
             elif opt == "--type":
                 self.load_settings()
@@ -111,6 +114,10 @@ class SaveClipBoardPic:
             elif opt in ["--help", "-h"]:
                 self.help()
                 sys.exit(-1)
+            elif opt == "--where":
+                self.load_settings()
+                print("saved path:{}".format(self.get_save_folder()))
+                print("saved type:{}".format(self.file_dict["pic type"]))
             elif opt is None:
                 print("Use -h to see all args")
             else:
