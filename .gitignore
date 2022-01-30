@@ -3,3 +3,4 @@ save_pic_from_clipboard.code-workspace
 build
 dist
 save_pic_from_clipboard.spec
+test

@@ -1,41 +1,48 @@
 from PIL import Image, ImageGrab
 import sys
-import getopt
 import os
 import json
-# os.chdir(os.path.dirname(__file__))
+import argparse
 
 
-class SaveClipBoardPic:
-    def __init__(self) -> None:
-        # if not os.path.exists("./settings.json"):
-        #     print("no file \"settings.json\", use -i to init")
-        #     sys.exit(0)
+class SaveClipBoardPic():
+
+    def __init__(self, args) -> None:
         self.save_folder_path = ""
         self.file_dict = dict()
         self.setting_file_path = "save-pic-settings.json"
+        self.params = args
+        self.check_parms()
+
+    def check_parms(self):
+        if (self.params.init):
+            self.init_setting()
+        else:
+            self.load_settings()
+
+        if (self.params.folder):
+            self.change_folder(os.path.abspath(self.params.folder.strip()))
+
+            
+        if (self.params.type):
+            self.change_type(self.params.type.strip())
+        
+        if (self.params.name):
+            self.save(self.params.name.strip())
+        pass
 
     def save(self, file_name):
         im = ImageGrab.grabclipboard()
         if isinstance(im, Image.Image):
             print("image:size:%s, mode: %s" % (im.size, im.mode))
             try:
-                im.save(os.path.join(self.save_folder_path, file_name + self.file_dict["pic type"]))
-                print("pic is saved in path:\"{}\"".format(os.path.join(self.save_folder_path, file_name + self.file_dict["pic type"])))
+                im.save(os.path.join(self.file_dict["save folder"], file_name + self.file_dict["pic type"]))
+                print("pic is saved in path:\"{}\"".format(
+                    os.path.join(self.file_dict["save folder"], file_name + self.file_dict["pic type"])))
             except FileNotFoundError as e:
                 print(e.strerror)
                 print("use -i to init folder or use --folder to set another folder")
                 sys.exit(-1)
-        # elif im:
-        #     for filename in im:
-        #         try:
-        #             print("filename: %s" % filename)
-        #             im = Image.open(filename)
-        #         except IOError:
-        #             pass  # ignore this file
-        #         else:
-        #             print("ImageList: size : %s, mode: %s" % (im.size, im.mode))
-        #             print("Path: " + os.path.abspath(filename))
         else:
             print("no pic in clipboard.")
 
@@ -44,107 +51,51 @@ class SaveClipBoardPic:
         return self.save_folder_path
 
     def init_setting(self):
-        self.file_dict = {"save folder": ".", "pic type": ".png"}
+        self.file_dict = {"save folder": os.path.abspath('.'), "pic type": ".png"}
         with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
 
     def load_settings(self):
         try:
             with open(self.setting_file_path, "r") as f:
-            
                 self.file_dict = json.load(f)
+                
         except FileNotFoundError:
-            print("you haven't init this program")
+            print("save-pic-settings.json is not founded")
             print("use -i to init it")
             sys.exit(-1)
-        
+
         try:
             folder_name, file_type = self.file_dict["save folder"], self.file_dict["pic type"]
         except KeyError:
             print("there is errors in settings.json, use -i to init it again")
+            sys.exit(-1)
+            
+        if (not os.path.exists(folder_name)):
+            print("save folder is not found")
             sys.exit(-1)
 
     def change_folder(self, folder_name: str):
         self.file_dict["save folder"] = folder_name
         with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
-            
+        
+        self.load_settings()
+
     def change_type(self, tp: str):
-        if tp not in [".jpg", ".png"]:
-            print("Error: type only support \" .jpg\", \" .png\"")
-            sys.exit(-1)
         self.file_dict["pic type"] = tp
         with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
-    
-    @staticmethod
-    def help():
-        print("help:")
-        print(" -i init the settings")
-        print(" -n the pic name(you don't need to enter the suffix like \".png\" it will use the \"pic type\" in the settings and add to the end of file name automatically)")
-        print(" -h see this help list")
-        print(" --folder change the saving folder")
-        print(" --type change the pic save type")
         
-    def run(self, argv):
-        try:
-            opts, args = getopt.getopt(argv, "hin:", ["name=", "help", "init", "folder=", "type=", "where"])
-        except getopt.GetoptError:
-            print("Use -h to see all args")
-            sys.exit(-1)
-        if opts == []:
-            print("Use -h to see help")
-            sys.exit(-1)
-        for opt, arg in opts:
-            if opt in ["-n", "--name"]:
-                self.load_settings()
-                self.get_save_folder()
-                self.save(arg)
-                
-            elif opt in ["-i", "--init"]:
-                self.init_setting()
-                
-            elif opt=="--folder":
-                self.load_settings()
-                self.change_folder(os.path.abspath(arg))
-                
-            elif opt == "--type":
-                self.load_settings()
-                self.change_type(arg)
-            elif opt in ["--help", "-h"]:
-                self.help()
-                sys.exit(-1)
-            elif opt == "--where":
-                self.load_settings()
-                print("saved path:{}".format(self.get_save_folder()))
-                print("saved type:{}".format(self.file_dict["pic type"]))
-            elif opt is None:
-                print("Use -h to see all args")
-            else:
-                print("Use -h to see all args")
-                sys.exit(-1)
-
-
-def get_name(argv):
-    file_name = ""
-    try:
-        opts, args = getopt.getopt(argv, "hi:n:", ["name=", "help", "init="])
-    except getopt.GetoptError:
-        print("Use -n to Enter the pic name")
-        sys.exit(-1)
-
-    for opt, arg in opts:
-        if opt in ["-n", "--name"]:
-            file_name = arg
-        else:
-            print("Use -n to Enter the pic name")
-            sys.exit(-1)
-    if file_name == "":
-        print("Use -n to Enter the pic name")
-        sys.exit(-1)
-    return file_name
+        self.load_settings()
 
 
 if __name__ == "__main__":
-    c = SaveClipBoardPic()
-    c.run(sys.argv[1:])
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
+    parser.add_argument("-n", "--name", help="the saved pic name", required=False)
+    parser.add_argument("-f", "--folder", help="the saved pic folder", required=False)
+    parser.add_argument("--info", required=False, action="store_true", help="print settings")
+    parser.add_argument("--type", required=False, help="set pic type", default='.png', choices=['.jpg', '.png'])
+    args = parser.parse_args()
+    SaveClipBoardPic(args=args)
