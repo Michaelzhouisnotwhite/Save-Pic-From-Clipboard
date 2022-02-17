@@ -5,6 +5,17 @@ import json
 import argparse
 
 
+def get_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
+    parser.add_argument("-n", "--name", help="the saved pic name", required=False)
+    parser.add_argument("-f", "--folder", help="the saved pic folder", required=False)
+    parser.add_argument("--info", required=False, action="store_true", help="print settings")
+    parser.add_argument("--type", required=False, help="set pic type", default='.png', choices=['.jpg', '.png'])
+    args = parser.parse_args()
+    return args
+
+
 class SaveClipBoardPic():
 
     def __init__(self, args) -> None:
@@ -23,10 +34,9 @@ class SaveClipBoardPic():
         if (self.params.folder):
             self.change_folder(os.path.abspath(self.params.folder.strip()))
 
-            
         if (self.params.type):
             self.change_type(self.params.type.strip())
-        
+
         if (self.params.name):
             self.save(self.params.name.strip())
         pass
@@ -59,7 +69,7 @@ class SaveClipBoardPic():
         try:
             with open(self.setting_file_path, "r") as f:
                 self.file_dict = json.load(f)
-                
+
         except FileNotFoundError:
             print("save-pic-settings.json is not founded")
             print("use -i to init it")
@@ -70,7 +80,7 @@ class SaveClipBoardPic():
         except KeyError:
             print("there is errors in settings.json, use -i to init it again")
             sys.exit(-1)
-            
+
         if (not os.path.exists(folder_name)):
             print("save folder is not found")
             sys.exit(-1)
@@ -79,23 +89,16 @@ class SaveClipBoardPic():
         self.file_dict["save folder"] = folder_name
         with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
-        
+
         self.load_settings()
 
     def change_type(self, tp: str):
         self.file_dict["pic type"] = tp
         with open(self.setting_file_path, "w") as f:
             json.dump(self.file_dict, f)
-        
+
         self.load_settings()
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
-    parser.add_argument("-n", "--name", help="the saved pic name", required=False)
-    parser.add_argument("-f", "--folder", help="the saved pic folder", required=False)
-    parser.add_argument("--info", required=False, action="store_true", help="print settings")
-    parser.add_argument("--type", required=False, help="set pic type", default='.png', choices=['.jpg', '.png'])
-    args = parser.parse_args()
-    SaveClipBoardPic(args=args)
+    SaveClipBoardPic(args=get_args())
