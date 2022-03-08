@@ -39,8 +39,14 @@ class SaveClipBoardPic():
 
         if (self.params.name):
             self.save(self.params.name.strip())
-        pass
-
+            
+        if (self.params.info):
+            self.show_settings()
+    
+    def show_settings(self):
+        print("saved folder path: ",self.file_dict['save folder'])
+        print("picture type: ",self.file_dict['pic type'])
+    
     def save(self, file_name):
         im = ImageGrab.grabclipboard()
         if isinstance(im, Image.Image):
