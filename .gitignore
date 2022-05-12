@@ -160,3 +160,6 @@ cython_debug/
 
 .vscode
 save-pic-settings.json
+
+.save_pic
+test
