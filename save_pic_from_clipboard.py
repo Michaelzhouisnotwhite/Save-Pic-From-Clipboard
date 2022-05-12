@@ -35,6 +35,11 @@ class Config:
 
     def load_config(self):
         if not os.path.exists(self.config_file_path):
+            try:
+                os.mkdir(f'{settings.userpath}/.save_pic')
+            except OSError as e:
+                if settings.DEBUG:
+                    print(e)
             with open(self.config_file_path, 'w') as f:
                 json.dump(self.config_file, f, indent=4, ensure_ascii=False)
 
@@ -72,8 +77,8 @@ class Config:
             if self.cur_config_idx == -1:
                 self.config['id'] = self.config_file[-1]['id'] + 1
                 self.config_file.append(self.config)
-                self.cur_config_idx = len(self.config_file)  - 1
-                
+                self.cur_config_idx = len(self.config_file) - 1
+
             else:
                 self.config_file[self.cur_config_idx] = self.config
 
@@ -148,7 +153,7 @@ class SaveClipBoardPic():
                 sys.exit(-1)
         else:
             print("no pic in clipboard.")
-        
+
         self.config.save_cur_config()
         self.config.save_config()
 
