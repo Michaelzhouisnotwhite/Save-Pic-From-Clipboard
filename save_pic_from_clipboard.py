@@ -14,6 +14,7 @@ def get_args():
     parser.add_argument("-f", "--folder", help="the saved pic folder", required=False)
     parser.add_argument("--info", required=False, action="store_true", help="print settings")
     parser.add_argument("-t", "--type", required=False, help="set pic type", default='.png', choices=['.jpg', '.png'])
+    parser.add_argument('--clear-cache', required=False, action='store_true', dest='clear')
     return parser.parse_args()
 
 
@@ -22,9 +23,11 @@ class Config:
         def __init__(self, *args) -> None:
             super().__init__(*args)
 
-    CONFIG_INIT = {'id': 0,
-                   "save folder": os.path.abspath('.'), "pic type": ".png",
-                   "hash": md5_hash(os.path.abspath('.'))}
+    CONFIG_INIT = {
+        "save folder": os.path.abspath('.'), 
+        "pic type": ".png",
+        "hash": md5_hash(os.path.abspath('.'))
+    }
 
     def __init__(self) -> None:
         self.config_file_path = settings.CONFIG_FILE
@@ -66,16 +69,16 @@ class Config:
         else:
             self.config['save folder'] = path
 
-    def delete_config(self, idx):
-        for config in self.config_file:
-            if idx == config['idx']:
-                self.config_file.remove(config)
-                break
+    # def delete_config(self, idx):
+    #     for config in self.config_file:
+    #         if idx == config['idx']:
+    #             self.config_file.remove(config)
+    #             break
 
     def save_cur_config(self):
         if len(self.config_file) > 0:
             if self.cur_config_idx == -1:
-                self.config['id'] = self.config_file[-1]['id'] + 1
+                # self.config['id'] = self.config_file[-1]['id'] + 1
                 self.config_file.append(self.config)
                 self.cur_config_idx = len(self.config_file) - 1
 
@@ -99,6 +102,10 @@ class Config:
             else:
                 print("Wrong Choices")
                 sys.exit(-1)
+
+    def clear_cache(self):
+        self.config_file.clear()
+        self.save_cur_config()
 
     def save_config(self):
         with open(self.config_file_path, 'w') as f:
@@ -133,6 +140,10 @@ class SaveClipBoardPic():
 
         if (self.params.info):
             self.show_settings()
+            
+        if (self.params.clear):
+            self.config.clear_cache()
+            self.config.save_config()
 
     def show_settings(self):
         print("saved folder path: ", self.config.config['save folder'])
