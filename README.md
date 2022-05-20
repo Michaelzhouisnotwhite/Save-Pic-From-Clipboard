@@ -33,7 +33,6 @@ python save_pic_from_clipboard.py --folder example -n [file name]
 
 [MIT LICENCE](LICENSE)
 
-
 ### examples
 
 need a picture

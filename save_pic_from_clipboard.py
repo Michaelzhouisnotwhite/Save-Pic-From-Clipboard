@@ -5,6 +5,11 @@ import json
 import argparse
 import settings
 from utils import md5_hash
+from colorprt import ColorprtConfig, Fore, colorstr
+
+green = ColorprtConfig(foreground=Fore.GREEN)
+blue = ColorprtConfig(foreground=Fore.BLUE)
+red = ColorprtConfig(foreground=Fore.RED)
 
 
 def get_args():
@@ -91,7 +96,7 @@ class Config:
 
     def init(self):
         if self.cur_config_idx != -1:
-            print("You have init this folder. Are you sure to init again? (Y/N)", end='')
+            blue("You have init this folder. Are you sure to init again? (Y/N)", end='')
             choice = str(input())
             if choice in ['Y', 'y']:
                 self.config = self.CONFIG_INIT
@@ -146,21 +151,21 @@ class SaveClipBoardPic():
             self.config.save_config()
 
     def show_settings(self):
-        print("saved folder path: ", self.config.config['save folder'])
-        print("picture type: ", self.config.config['pic type'])
+        print(colorstr("saved folder path: ", config=blue), self.config.config['save folder'])
+        print(colorstr("picture type: ", config=blue), self.config.config['pic type'])
 
     def save(self, file_name):
         im = ImageGrab.grabclipboard()
         file_dict = self.config.config
         if isinstance(im, Image.Image):
-            print("image:size:%s, mode: %s" % (im.size, im.mode))
+            green("image:size:%s, mode: %s" % (im.size, im.mode))
             try:
                 im.save(os.path.join(file_dict["save folder"], file_name + file_dict["pic type"]))
-                print("pic is saved in path:\"{}\"".format(
+                green("pic is saved in path:\"{}\"".format(
                     os.path.join(file_dict["save folder"], file_name + file_dict["pic type"])))
             except FileNotFoundError as e:
-                print(e.strerror)
-                print("use -i to init folder or use --folder to set another folder")
+                red(e.strerror)
+                red("use -i to init folder or use --folder to set another folder")
                 sys.exit(-1)
         else:
             print("no pic in clipboard.")
