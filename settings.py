@@ -7,5 +7,10 @@ DEBUG = False
 if DEBUG:
     CONFIG_FILE = f'{BASE_DIR}/.save_pic/config.json'
 else:
-    userpath = os.getenv('USERPROFILE')
+    from utils import PlatForm
+    if PlatForm.get_local() == PlatForm.LINUX:
+        userpath = os.getenv("HOME")
+    elif PlatForm.get_local() == PlatForm.WINDOWS:
+        userpath = os.getenv('USERPROFILE')
+        
     CONFIG_FILE = f'{userpath}/.save_pic/config.json'

@@ -7,9 +7,9 @@ import settings
 from utils import md5_hash
 from colorprt import ColorprtConfig, Fore, colorstr
 
-green = ColorprtConfig(foreground=Fore.GREEN)
-blue = ColorprtConfig(foreground=Fore.BLUE)
-red = ColorprtConfig(foreground=Fore.RED)
+green = ColorprtConfig(Fore.GREEN)
+blue = ColorprtConfig(Fore.BLUE)
+red = ColorprtConfig(Fore.RED)
 
 
 def get_args():
@@ -96,7 +96,7 @@ class Config:
 
     def init(self):
         if self.cur_config_idx != -1:
-            blue("You have init this folder. Are you sure to init again? (Y/N)", end='')
+            blue.print("You have init this folder. Are you sure to init again? (Y/N)", end='')
             choice = str(input())
             if choice in ['Y', 'y']:
                 self.config = self.CONFIG_INIT
@@ -158,10 +158,10 @@ class SaveClipBoardPic():
         im = ImageGrab.grabclipboard()
         file_dict = self.config.config
         if isinstance(im, Image.Image):
-            green("image:size:%s, mode: %s" % (im.size, im.mode))
+            green.print("image:size:%s, mode: %s" % (im.size, im.mode))
             try:
                 im.save(os.path.join(file_dict["save folder"], file_name + file_dict["pic type"]))
-                green("pic is saved in path:\"{}\"".format(
+                green.print("pic is saved in path:\"{}\"".format(
                     os.path.join(file_dict["save folder"], file_name + file_dict["pic type"])))
             except FileNotFoundError as e:
                 red(e.strerror)
