@@ -15,6 +15,8 @@ red = ColorprtConfig(Fore.RED)
 
 def get_args():
     parser = argparse.ArgumentParser()
+    # config_arg_group = parser.add_argument_group("config", "for config")
+    # config_arg_group.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
     parser.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
     parser.add_argument("-n", "--name", help="the saved pic name", required=False)
     parser.add_argument("-f", "--folder", help="the saved pic folder", required=False)
