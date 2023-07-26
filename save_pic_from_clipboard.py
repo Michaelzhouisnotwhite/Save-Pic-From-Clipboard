@@ -1,4 +1,5 @@
 from PIL import Image, ImageGrab
+import pyscreenshot as pyss
 import sys
 import os
 import json
@@ -128,9 +129,9 @@ class SaveClipBoardPic():
             print(md5_hash(self.cur_path))
         self.config.get_cur_config(self.cur_path)
         self.params = args
-        self.check_parms()
+        self.check_params()
 
-    def check_parms(self):
+    def check_params(self):
         if (self.params.init):
             self.init_setting()
 
