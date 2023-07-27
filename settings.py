@@ -6,6 +6,7 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DEBUG = False
 if DEBUG:
     CONFIG_FILE = f'{BASE_DIR}/.save_pic/config.json'
+    userpath = BASE_DIR
 else:
     from utils import PlatForm
     if PlatForm.get_local() == PlatForm.LINUX:

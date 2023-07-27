@@ -13,17 +13,17 @@ blue = ColorprtConfig(Fore.BLUE)
 red = ColorprtConfig(Fore.RED)
 
 
-def get_args():
+def parser_init():
     parser = argparse.ArgumentParser()
-    # config_arg_group = parser.add_argument_group("config", "for config")
-    # config_arg_group.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
-    parser.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
-    parser.add_argument("-n", "--name", help="the saved pic name", required=False)
+    parser.add_argument('--clear-cache', required=False, action='store_true', dest='clear')
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-i", "--init", help="init the saving settings", required=False, action="store_true")
+    group.add_argument("-n", "--name", help="the saved pic name", required=False)
+    
     parser.add_argument("-f", "--folder", help="the saved pic folder", required=False)
     parser.add_argument("--info", required=False, action="store_true", help="print settings")
     parser.add_argument("-t", "--type", required=False, help="set pic type", default='.png', choices=['.jpg', '.png'])
-    parser.add_argument('--clear-cache', required=False, action='store_true', dest='clear')
-    return parser.parse_args()
+    return parser
 
 
 class Config:
@@ -157,7 +157,7 @@ class SaveClipBoardPic():
         print(colorstr("saved folder path: ", config=blue), self.config.config['save folder'])
         print(colorstr("picture type: ", config=blue), self.config.config['pic type'])
 
-    def save(self, file_name):
+    def save(self, file_name: str):
         im = ImageGrab.grabclipboard()
         file_dict = self.config.config
         if isinstance(im, Image.Image):
@@ -167,8 +167,8 @@ class SaveClipBoardPic():
                 green.print("pic is saved in path:\"{}\"".format(
                     os.path.join(file_dict["save folder"], file_name + file_dict["pic type"])))
             except FileNotFoundError as e:
-                red(e.strerror)
-                red("use -i to init folder or use --folder to set another folder")
+                red.print(e.strerror)
+                red.print("use -i to init folder or use --folder to set another folder")
                 sys.exit(-1)
         else:
             print("no pic in clipboard.")
@@ -193,4 +193,4 @@ class SaveClipBoardPic():
 
 
 if __name__ == "__main__":
-    SaveClipBoardPic(args=get_args())
+    SaveClipBoardPic(args=parser_init().parse_args())
