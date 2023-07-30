@@ -1,2 +1,2 @@
-Pillow
-colorprt
+colorprt==3.0.2
+Pillow==10.0.0

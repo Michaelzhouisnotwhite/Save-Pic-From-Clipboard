@@ -1,5 +1,4 @@
 from PIL import Image, ImageGrab
-import pyscreenshot as pyss
 import sys
 import os
 import json
